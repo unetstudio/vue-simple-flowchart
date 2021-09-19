@@ -12,10 +12,10 @@
       <div v-text="type" class="node-type"></div>
       <div v-text="label" class="node-label"></div>
     </div>
-    <div class="node-port node-output" 
+    <div v-if="show.port" class="node-port node-output" 
       @mousedown="outputMouseDown">
     </div>
-    <div v-show="show.delete" class="node-delete">&times;</div>
+    <div v-if="show.delete" class="node-delete">&times;</div>
   </div>
 </template>
 
@@ -67,6 +67,7 @@ export default {
     return {
       show: {
         delete: false,
+        port: false,
       }
     }
   },
@@ -118,29 +119,44 @@ $portSize: 12;
 
 .flowchart-node {
   margin: 0;
-  width: 80px;
-  height: 80px;
   position: absolute;
   box-sizing: border-box;
   border: none;
-  background: white;
   z-index: 1;
   opacity: .9;
   cursor: move;
   transform-origin: top left;
+
+  background: #fff;
+  width: auto;
+  min-width: 150px;
+  height: auto;
+  min-height: 100px;
+  border: 1px solid #316896;
+
   .node-main {
-    text-align: center;
+    text-align: left;
     .node-type {
-      background: $themeColor;
+      //background: $themeColor;
+      background: #07c;
       color: white;
-      font-size: 13px;
+      font-size: 1.1rem;
+      font-weight: bold;
       padding: 6px;
     }
     .node-label {
-      font-size: 13px;
+      padding: 6px;
+      font-size: 1rem;
+      white-space: pre;
+      background: white;
+      color: #222;
+    }
+    .node-row {
+      background: aliceblue;
     }
   }
   .node-port {
+    display: none;
     position: absolute;
     width: #{$portSize}px;
     height: #{$portSize}px;
@@ -161,6 +177,7 @@ $portSize: 12;
     bottom: #{-2+$portSize/-2}px;
   }
   .node-delete {
+    display: none;
     position: absolute;
     right: -6px;
     top: -6px;
@@ -180,6 +197,7 @@ $portSize: 12;
   }
 }
 .selected {
-  box-shadow: 0 0 0 2px $themeColor;
+  //box-shadow: 0 0 0 2px $themeColor;
+  box-shadow: none;
 }
 </style>

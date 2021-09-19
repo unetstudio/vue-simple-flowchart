@@ -38,23 +38,28 @@ export default {
             id: 2,
             x: -700,
             y: -69,
-            type: 'Action',
-            label: 'test1',
+            type: 'Users',
+            label: `
+    id int PK
+    company_id -> users.id
+    members varchar [array]
+    telephone varchar
+    email varchar
+    fax varchar
+    content text nullable
+            `,
           },
           {
             id: 4,
             x: -357,
             y: 80,
-            type: 'Script',
-            label: 'test2',
+            type: 'Company',
+            label: `
+    id int PK
+    company_id -> users.id
+    project_id -> projects.id
+            `,
           },
-          {
-            id: 6,
-            x: -557,
-            y: 80,
-            type: 'Rule',
-            label: 'test3',
-          }
         ],
         links: [
           {

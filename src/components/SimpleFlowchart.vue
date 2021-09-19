@@ -263,9 +263,10 @@ export default {
 <style scoped lang="scss">
 .flowchart-container {
   margin: 0;
-  background: #ddd;
   position: relative;
   overflow: hidden;
+  background: linear-gradient(90deg, white 21px, transparent 1%) center, linear-gradient(white 21px, transparent 1%) center, #a799cc;
+  background-size: 22px 22px;
   svg {
     cursor: grab;
   }

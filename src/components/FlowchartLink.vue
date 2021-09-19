@@ -69,14 +69,14 @@ export default {
   computed: {
     pathStyle() {
       return {
-        stroke: 'rgb(255, 136, 85)',
+        stroke: '#07c',
         strokeWidth: 2.73205,
         fill: 'none',
       }
     },
     arrowStyle() {
       return {
-        stroke: 'rgb(255, 136, 85)',
+        stroke: '#07c',
         strokeWidth: 5.73205,
         fill: 'none',
       }
