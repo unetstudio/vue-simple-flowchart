@@ -1,24 +1,32 @@
 <template>
-  <div class="flowchart-container" 
-    @mousemove="handleMove" 
-    @mouseup="handleUp"
-    @mousedown="handleDown">
-    <svg width="100%" :height="`${height}px`">
-      <flowchart-link v-bind.sync="link" 
-        v-for="(link, index) in lines" 
-        :key="`link${index}`"
-        @deleteLink="linkDelete(link.id)">
-      </flowchart-link>
-    </svg>
-    <flowchart-node v-bind.sync="node" 
-      v-for="(node, index) in scene.nodes" 
-      :key="`node${index}`"
-      :options="nodeOptions"
-      @linkingStart="linkingStart(node.id)"
-      @linkingStop="linkingStop(node.id)"
-      @nodeSelected="nodeSelected(node.id, $event)">
-    </flowchart-node>
-  </div>
+    <div class="flowchart">
+        <div class="flowchart-container" @wheel="handleWheel()" @wheel.prevent
+            @mousemove="handleMove"
+            @mouseup="handleUp"
+            @mousedown="handleDown">
+            <svg width="100%" :height="`${height}px`">
+              <flowchart-link v-bind.sync="link"
+                v-for="(link, index) in lines"
+                :key="`link${index}`"
+                @deleteLink="linkDelete(link.id)">
+              </flowchart-link>
+            </svg>
+            <flowchart-node v-bind.sync="node"
+              v-for="(node, index) in scene.nodes"
+              :key="`node${index}`"
+              :options="nodeOptions"
+              @linkingStart="linkingStart(node.id)"
+              @linkingStop="linkingStop(node.id)"
+              @nodeSelected="nodeSelected(node.id, $event)">
+            </flowchart-node>
+          </div>
+        <div class="tool-wrapper">
+            {{ zoomValue }} <input id="tool" :min="zoom.min" :max="zoom.max" v-model="zoom.value" step="zoom.step" @change="showZoomVal()" type="range"/>
+            <span class="action">
+                Focus
+            </span>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -65,6 +73,12 @@ export default {
         top: 0,
         left: 0
       },
+      zoom: {
+          min: 5,
+          value: 10,
+          max: 15,
+          step: 1
+      }
     };
   },
   components: {
@@ -112,14 +126,50 @@ export default {
         })
       }
       return lines;
+    },
+    zoomValue() {
+        return `${Math.round(this.zoom.value)}0%`;
     }
   },
   mounted() {
     this.rootDivOffset.top = this.$el ? this.$el.offsetTop : 0;
     this.rootDivOffset.left = this.$el ? this.$el.offsetLeft : 0;
-    // console.log(22222, this.rootDivOffset);
   },
   methods: {
+      setZoom(zoom,el) {
+          var transformOrigin = [0,0];
+          var p = ["webkit", "moz", "ms", "o"],
+                s = "scale(" + zoom + ")",
+                oString = (transformOrigin[0] * 100) + "% " + (transformOrigin[1] * 100) + "%";
+
+          for (var i = 0; i < p.length; i++) {
+              el.style[p[i] + "Transform"] = s;
+              el.style[p[i] + "TransformOrigin"] = oString;
+          }
+
+          el.style["transform"] = s;
+          el.style["transformOrigin"] = oString;
+    },
+    showZoomVal(){
+      var zoomScale = Number(this.zoom.value) / 10;
+      this.setZoom(zoomScale,document.getElementsByClassName('flowchart-container')[0])
+    },
+    handleWheel() {
+      const $this = this;
+      window.addEventListener('wheel', function(event) {
+          if (event.deltaY < 0) {
+              if ($this.zoom.value < $this.zoom.max) {
+                  $this.zoom.value = $this.zoom.value + 0.05;
+              }
+              $this.showZoomVal()
+          } else if (event.deltaY > 0) {
+              if ($this.zoom.value > $this.zoom.min) {
+                  $this.zoom.value = $this.zoom.value - 0.05;
+              }
+              $this.showZoomVal()
+          }
+      })
+    },
     findNodeWithID(id) {
       return this.scene.nodes.find((item) => {
           return id === item.id
@@ -265,10 +315,20 @@ export default {
   margin: 0;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(90deg, white 21px, transparent 1%) center, linear-gradient(white 21px, transparent 1%) center, #a799cc;
-  background-size: 22px 22px;
   svg {
     cursor: grab;
   }
+}
+.tool-wrapper {
+    position: relative;
+    background: #f1f1f1;
+    padding: 10px;
+    width: 30%;
+    border-radius: 20px;
+    margin: 0 auto;
+}
+.action {
+    margin: 0 10px;
+    cursor: pointer;
 }
 </style>

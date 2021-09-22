@@ -1,19 +1,13 @@
 <template>
   <div id="app">
-    <h1> simple flowchart</h1>
-    <div class="tool-wrapper">
-      <input id="test" min="6" max="16" v-model="value" step="2" @change="showVal()" type="range"/>
-    </div>
-    
-    <div class="zoom" @wheel="handleWheel()" @wheel.prevent>
-      <simple-flowchart :scene.sync="scene" 
+    <simple-flowchart :scene.sync="scene"
       @nodeClick="nodeClick"
       @nodeDelete="nodeDelete"
       @linkBreak="linkBreak"
       @linkAdded="linkAdded"
       @canvasClick="canvasClick"
-      :height="800"/>
-    </div>
+      :height="650"
+    />
   </div>
 </template>
 
@@ -73,44 +67,12 @@ export default {
         'fork',
         'join',
       ],
-      value: 10,
+
     }
   },
   methods: {
     canvasClick(e) {
       console.log('canvas Click, event:', e)
-    },
-    setZoom(zoom,el) {
-          
-          var transformOrigin = [0,0];
-          var p = ["webkit", "moz", "ms", "o"],
-                s = "scale(" + zoom + ")",
-                oString = (transformOrigin[0] * 100) + "% " + (transformOrigin[1] * 100) + "%";
-
-          for (var i = 0; i < p.length; i++) {
-              el.style[p[i] + "Transform"] = s;
-              el.style[p[i] + "TransformOrigin"] = oString;
-          }
-
-          el.style["transform"] = s;
-          el.style["transformOrigin"] = oString;
-          
-    },
-    showVal(){
-      var zoomScale = Number(this.value)/10;
-      this.setZoom(zoomScale,document.getElementsByClassName('flowchart-container')[0])
-    },
-    handleWheel() {
-      const $this = this;
-      window.addEventListener('wheel', function(event) {
-          if (event.deltaY < 0) {
-              $this.value++
-              $this.showVal()
-          } else if (event.deltaY > 0) {
-              $this.value--
-              $this.showVal()
-          }
-      })
     },
     addNode() {
       let maxID = Math.max(0, ...this.scene.nodes.map((link) => {
