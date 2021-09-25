@@ -21,10 +21,23 @@
             </flowchart-node>
           </div>
         <div class="tool-wrapper">
-            {{ zoomValue }} <input id="tool" :min="zoom.min" :max="zoom.max" v-model="zoom.value" step="zoom.step" @change="showZoomVal()" type="range"/>
-            <span class="action">
-                Focus
-            </span>
+            <div class="action">
+                <span>
+                    <i class="material-icons">zoom_out_map</i>
+                    <input id="tool" :min="zoom.min" :max="zoom.max" v-model="zoom.value" step="zoom.step" @change="showZoomVal()" type="range"/>
+                    {{ zoomValue }}
+                </span>
+            </div>
+            <div class="action">
+                <span>
+                    <i class="material-icons">crop_free</i> Focus
+                </span>
+            </div>
+            <div class="action" @click="exportDiagram()">
+                <span>
+                    <i class="material-icons">file_download</i> Export
+                </span>
+            </div>
         </div>
     </div>
 </template>
@@ -33,6 +46,7 @@
 import FlowchartLink from './FlowchartLink.vue';
 import FlowchartNode from './FlowchartNode.vue';
 import { getMousePosition } from '../assets/utilty/position';
+import html2canvas from 'html2canvas';
 
 export default {
   name: 'VueFlowchart',
@@ -136,6 +150,11 @@ export default {
     this.rootDivOffset.left = this.$el ? this.$el.offsetLeft : 0;
   },
   methods: {
+      exportDiagram() {
+          html2canvas(document.querySelector("#capture")).then(function(canvas) {
+            document.body.appendChild(canvas)
+          });
+      },
       setZoom(zoom,el) {
           var transformOrigin = [0,0];
           var p = ["webkit", "moz", "ms", "o"],
@@ -311,24 +330,29 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-.flowchart-container {
-  margin: 0;
-  position: relative;
-  overflow: hidden;
-  svg {
-    cursor: grab;
-  }
-}
-.tool-wrapper {
-    position: relative;
-    background: #f1f1f1;
-    padding: 10px;
-    width: 30%;
-    border-radius: 20px;
-    margin: 0 auto;
-}
-.action {
-    margin: 0 10px;
-    cursor: pointer;
-}
+    .flowchart-container {
+      margin: 0;
+      position: relative;
+      overflow: hidden;
+      svg {
+        cursor: grab;
+      }
+    }
+    .tool-wrapper {
+        position: relative;
+        background: #f1f1f1;
+        padding: 10px;
+        width: 30%;
+        border-radius: 20px;
+        margin: 0 auto;
+    }
+    .action {
+        margin: 0 10px;
+        cursor: pointer;
+        display: inline-block;
+    }
+    .action span {
+        display: flex;
+        align-items: center;
+    }
 </style>
