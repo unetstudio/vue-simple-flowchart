@@ -15,4 +15,164 @@
     <div id="app"></div>
     <!-- built files will be auto injected -->
   </body>
+<script>
+    const template = `
+{% file App/Constants/%Model%.php %}
+<?php
+
+namespace App\Constants;
+
+class %Model%
+{
+    const LIMIT = 10;
+}
+
+{% endfile %}
+
+{% file App/Http/Resources/%Model%Resource.php %}
+<?php
+
+namespace App\Http\Resources;
+
+use App\Constants\%Model%;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class %Model%Resource extends JsonResource
+{
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @return array
+     */
+    public function toArray($request): array
+    {
+        return [
+            'id' => $this->id,
+            {% forColumn %}
+     		'%column%' => $this->%column% ?? null,
+  			{% endfor %}
+        ];
+    }
+}
+
+{% endfile %}
+
+{% file App/Models/%Model%Model.php %}
+<?php
+
+namespace App\Models;
+
+use App\Constants\%Model%;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Builder;
+
+class %Model%Model extends BaseModel
+{
+    use SoftDeletes;
+
+    protected $table = '%model%';
+    protected $fillable = [
+        {% forColumn %}
+        '%column%',
+        {% endfor %}
+    ];
+    protected $dates = ['deleted_at'];
+ 	protected $casts = [
+        'date' => 'datetime',
+        'list' => 'array',
+    ];
+
+    public function toArray()
+    {
+        $array = parent::toArray();
+        return $array;
+    }
+}
+
+{% endfile %}
+
+{% file App/Repositories/%Model%Repository.php %}
+<?php
+
+namespace App\Repositories;
+
+use App\Repositories\Eloquent\Repository;
+
+class %Model%Repository extends Repository
+{
+    public function model()
+    {
+        return 'App\Models\%Model%Model';
+    }
+
+    public function search($function)
+    {
+        return $this->model->search($function);
+    }
+}
+
+{% endfile %}
+
+{% file Routes/Route/%Model%.php %}
+<?php
+
+namespace Routes\Route;
+
+use Illuminate\Support\Facades\Route;
+
+class %Model%
+{
+    public static function apiRoutes()
+    {
+        Route::resource('%model%s', '%Model%Controller', [
+            'as' => 'api'
+        ]);
+    }
+}
+
+{% endfile %}
+`;
+
+    const table = `
+table user {
+id int pk
+}
+`;
+    let regexp = /{% ?file ?(.*?) ?%}(.*?){% ?endfile ?%}/isg;
+    let files = [...template.matchAll(regexp)];
+    files = files.filter((file) => {
+        return file.length > 2;
+    });
+    files = files.map((file) => {
+        return {
+            name: file[1],
+            content: file[2],
+        }
+    });
+    console.log(files);
+
+    let result = [];
+    let level = {result};
+
+    files.forEach(file => {
+        const path = file.name;
+        path.split('/').reduce((r, name, i, a) => {
+            if (!r[name]) {
+                r[name] = {result: []};
+                const children = r[name].result;
+                const obj = {name};
+
+                obj.children = children;
+                if (name.indexOf('.') > -1) {
+                    obj.file = name.split('.')[1];
+                }
+
+                r.result.push(obj)
+            }
+
+            return r[name];
+        }, level)
+    });
+
+    console.log(result);
+</script>
 </html>
