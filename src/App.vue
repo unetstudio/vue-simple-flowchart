@@ -13,6 +13,8 @@
 
 <script>
 import SimpleFlowchart from './components/SimpleFlowchart.vue'
+import { format } from 'sql-formatter';
+import { Parser } from '@dbml/core';
 
 export default {
   name: 'app',
@@ -70,7 +72,92 @@ export default {
 
     }
   },
+  created() {
+      this.fileTree();
+  },
   methods: {
+    fileTree() {
+        let paths = [
+            "About.vue",
+            "Categories/Index.vue",
+            "Categories/Demo.vue",
+            "Categories/Flavors.vue",
+            "Categories/Types/Index.vue",
+            "Categories/Types/Other.vue"
+        ];
+
+        paths = [
+            "App/Constants/%Model%.php",
+            "App/Services/%Model%Service.php",
+            "App/Http/Requests/Api/%Model%Request.php",
+            "Routes/Route/%Model%.php",
+            "Resources/lang/ja/%model%.php",
+        ];
+
+        var items = [
+        {
+          name: '.git',
+        },
+        {
+          name: 'node_modules',
+        },
+        {
+          name: 'public',
+          children: [
+            {
+              name: 'static',
+              children: [{
+                name: 'logo.png',
+                file: 'png',
+              }],
+            },
+            {
+              name: 'favicon.ico',
+              file: 'png',
+            },
+            {
+              name: 'index.html',
+              file: 'html',
+            },
+          ],
+        }];
+
+        let result = [];
+        let level = {result};
+
+        paths.forEach(path => {
+          path.split('/').reduce((r, name, i, a) => {
+            if(!r[name]) {
+              r[name] = {result: []};
+              if (name.indexOf('.') > -1) {
+                  const file = name.split('.')[1]
+                  r.result.push({name, file, children: r[name].result})
+              } else {
+                  r.result.push({name, children: r[name].result})
+              }
+            }
+
+            return r[name];
+          }, level)
+        });
+
+        console.log(result);
+        console.log(items)
+    },
+    sqlParser() {
+        console.log(format('SELECT * FROM tbl'));
+
+    var dbml = `
+table users {
+  id int pk
+  username varchar
+  role varchar
+  created_at timestamp
+}
+`;
+    const database = Parser.parse(dbml, 'dbml');
+    console.log(database);
+    },
     canvasClick(e) {
       console.log('canvas Click, event:', e)
     },
